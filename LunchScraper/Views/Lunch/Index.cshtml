@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Html;
-@{
+﻿@{
     ViewBag.Title = "Lunch Options";
 }
 
@@ -8,13 +7,23 @@
 <h3>Malmo Arena Lunch</h3>
 @foreach (var item in ViewBag.MalmoArenaMenu)
 {
-    @(new HtmlString(@item))
+    <strong>@item.DayOfTheWeek</strong>@item.Price<br />
+    <ul>
+    @foreach (var food in item.Items)
+    {
+            <li>@food.Name</li>
+        }
+    </ul>
 }
-
 
 <h3>Edge Kitchen Lunch</h3>
 @foreach (var item in ViewBag.EdgeKitchenMenu)
 {
-    @(new HtmlString(@item))
+    <strong>@item.DayOfTheWeek</strong>@item.Price<br />
+    <ul>
+    @foreach (var food in item.Items)
+    {
+            <li>@food.Name</li>
+        }
+    </ul>
 }
-

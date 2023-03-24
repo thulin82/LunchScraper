@@ -12,7 +12,7 @@ namespace LunchScraper.Controllers
             var edgeKitchenMenu = GetEdgeKitchenLunch();
 
             ViewBag.MalmoArenaMenu = malmoArenaMenu;
-            ViewBag.EdgeKitchenMenu = RemoveCenter(edgeKitchenMenu);
+            ViewBag.EdgeKitchenMenu = edgeKitchenMenu;
 
             return View();
         }
@@ -21,23 +21,45 @@ namespace LunchScraper.Controllers
         /// Get lunch menu from Edge Kitchen
         /// </summary>
         /// <returns></returns>
-        private List<string> GetEdgeKitchenLunch()
+        private List<DailyLunch> GetEdgeKitchenLunch()
         {
             var web = new HtmlWeb();
             var doc = web.LoadFromWebAsync("https://edgekitchen.se/meny", System.Text.Encoding.UTF8).Result;
-            var menu = doc.DocumentNode.SelectNodes("//body/div[4]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]");
-            return menu.Select(x => x.InnerHtml.Trim()).ToList();
+            var nodes = doc.DocumentNode.SelectNodes("//body/div[4]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/p[position()>4 and position()<24]");
+
+            List<DailyLunch> items = new List<DailyLunch>();
+
+            // Loop through all the nodes, and add the lunch items to the list, all the nodes are p nodes, and the ones
+            // that we are interested in are in the format of "Day of the week, 1st dish, 2nd dish, empty" and then it repeats for days monday-friday
+            for (int i = 0; i < nodes.Count; i += 4)
+            {
+                // Get the day of the week
+                var dayOfTheWeekNode = nodes[i];
+                var dayOfTheWeek = HtmlEntity.DeEntitize(dayOfTheWeekNode.InnerText.ToUpper());
+
+                // Get the 1st dish
+                var firstDishNode = nodes[i + 1];
+                var firstDish = HtmlEntity.DeEntitize(firstDishNode.InnerText);
+
+                // Get the 2nd dish
+                var secondDishNode = nodes[i + 2];
+                var secondDish = HtmlEntity.DeEntitize(secondDishNode.InnerText);
+
+                items.Add(new DailyLunch()
+                {
+                    DayOfTheWeek = dayOfTheWeek,
+                    Items = new List<LunchItem>()
+                    {
+                        new LunchItem() { Name = firstDish },
+                        new LunchItem() { Name = secondDish }
+                    },
+                    Price = "119 kr"
+                });
+            }
+
+            return items;
         }
 
-        /// <summary>
-        /// Remove the string "style=\"text-align: center;\"" from the list
-        /// </summary>
-        /// <param name="menu"></param>
-        /// <returns></returns>
-        private List<string> RemoveCenter(List<string> menu)
-        {
-            return menu.Select(x => x.Replace("style=\"text-align: center;\"", "")).ToList();
-        }
 
         /// <summary>
         /// Get lunch menu from Malmö Arena
@@ -87,10 +109,7 @@ namespace LunchScraper.Controllers
                     Price = HtmlEntity.DeEntitize(node.SelectSingleNode("span").InnerText),
                 });
             }
-
             return items;
         }
-
-
     }
 }
