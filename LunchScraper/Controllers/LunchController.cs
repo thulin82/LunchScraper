@@ -29,8 +29,6 @@ namespace LunchScraper.Controllers
 
             List<DailyLunch> items = new List<DailyLunch>();
 
-            // Loop through all the nodes, and add the lunch items to the list, all the nodes are p nodes, and the ones
-            // that we are interested in are in the format of "Day of the week, 1st dish, 2nd dish, empty" and then it repeats for days monday-friday
             for (int i = 0; i < nodes.Count; i += 4)
             {
                 // Get the day of the week
@@ -68,8 +66,8 @@ namespace LunchScraper.Controllers
         private List<DailyLunch> GetMalmoArenaLunch()
         {
             var web = new HtmlWeb();
-            var document = web.LoadFromWebAsync("https://www.malmoarena.com/mat-dryck/lunch", System.Text.Encoding.UTF8).Result;
-            var nodes = document.DocumentNode.SelectNodes("//body/div[4]/div[1]/div[1]/div[1]/div[3]/div[1]/div[1]/div[3]/p[position()>1]");
+            var doc = web.LoadFromWebAsync("https://www.malmoarena.com/mat-dryck/lunch", System.Text.Encoding.UTF8).Result;
+            var nodes = doc.DocumentNode.SelectNodes("//body/div[4]/div[1]/div[1]/div[1]/div[3]/div[1]/div[1]/div[3]/p[position()>1]");
 
             List<DailyLunch> items = new List<DailyLunch>();
 
@@ -77,28 +75,28 @@ namespace LunchScraper.Controllers
             {
                 var lunchItems = new List<LunchItem>();
 
-                var firstItemNode = node.SelectSingleNode("br[1]").NextSibling;
-                var secondItemNode = node.SelectSingleNode("br[2]");
-                var thirdItemNode = node.SelectSingleNode("br[3]");
+                var firstDishNode = node.SelectSingleNode("br[1]").NextSibling;
+                var secondDishNode = node.SelectSingleNode("br[2]");
+                var thirdDishNode = node.SelectSingleNode("br[3]");
 
                 lunchItems.Add(new LunchItem()
                 {
-                    Name = HtmlEntity.DeEntitize(firstItemNode.InnerText)
+                    Name = HtmlEntity.DeEntitize(firstDishNode.InnerText)
                 });
 
-                if (secondItemNode != null && secondItemNode.NextSibling != null)
+                if (secondDishNode != null && secondDishNode.NextSibling != null)
                 {
                     lunchItems.Add(new LunchItem()
                     {
-                        Name = HtmlEntity.DeEntitize(secondItemNode.NextSibling.InnerText)
+                        Name = HtmlEntity.DeEntitize(secondDishNode.NextSibling.InnerText)
                     });
                 }
 
-                if (thirdItemNode != null && thirdItemNode.NextSibling != null)
+                if (thirdDishNode != null && thirdDishNode.NextSibling != null)
                 {
                     lunchItems.Add(new LunchItem()
                     {
-                        Name = HtmlEntity.DeEntitize(thirdItemNode.NextSibling.InnerText)
+                        Name = HtmlEntity.DeEntitize(thirdDishNode.NextSibling.InnerText)
                     });
                 }
 
