@@ -2,28 +2,44 @@
     ViewBag.Title = "Lunch Options";
 }
 
-<h2>Lunch Options</h2>
+<h1>Lunch Options</h1>
 
 <h3>Malmo Arena Lunch</h3>
 @foreach (var item in ViewBag.MalmoArenaMenu)
 {
-    <strong>@item.DayOfTheWeek</strong>@item.Price<br />
+    <strong>@item.DayOfTheWeek</strong>
+    <span>@item.Price</span>
+    <br />
     <ul>
     @foreach (var food in item.Items)
     {
-            <li>@food.Name</li>
-        }
+        <li>@food.Name</li>
+    }
     </ul>
 }
 
 <h3>Edge Kitchen Lunch</h3>
 @foreach (var item in ViewBag.EdgeKitchenMenu)
 {
-    <strong>@item.DayOfTheWeek</strong>@item.Price<br />
+    <strong>@item.DayOfTheWeek</strong>
+    <span>@item.Price</span>
+    <br />
     <ul>
     @foreach (var food in item.Items)
     {
-            <li>@food.Name</li>
-        }
+        <li>@food.Name</li>
+    }
+    </ul>
+}
+
+<h3>Malmö Opera Lunch</h3>
+@foreach (var item in ViewBag.MalmoOperaMenu)
+{
+    <ul>
+    @foreach (var food in item.Items)
+    {
+        <li>@food.Type@food.Name</li>
+            @item.Price
+    }
     </ul>
 }
