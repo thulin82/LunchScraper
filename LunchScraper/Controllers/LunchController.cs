@@ -10,11 +10,64 @@ namespace LunchScraper.Controllers
         {
             var malmoArenaMenu = GetMalmoArenaLunch();
             var edgeKitchenMenu = GetEdgeKitchenLunch();
+            var malmoOperaMenu = GetMalmoOperaLunch();
 
             ViewBag.MalmoArenaMenu = malmoArenaMenu;
             ViewBag.EdgeKitchenMenu = edgeKitchenMenu;
+            ViewBag.MalmoOperaMenu = malmoOperaMenu;
 
             return View();
+        }
+
+        /// <summary>
+        /// Get lunch menu from Malmö Opera
+        /// </summary>
+        /// <returns></returns>
+        private List<DailyLunch> GetMalmoOperaLunch()
+        {
+            var web = new HtmlWeb();
+            var doc = web.LoadFromWebAsync("https://www.malmoopera.se/mat-och-dryck/lunchmeny", System.Text.Encoding.UTF8).Result;
+            var nodes = doc.DocumentNode.SelectNodes("//body/div[@id='page-wrapper']/div[1]/div[2]/div[1]/section[1]/div[1]/p[position()>2 and position()<7]");
+
+            List<DailyLunch> items = new List<DailyLunch>();
+
+            var firstDishNode = SplitStringtoDailyLunch(nodes[0].InnerHtml);
+            var secondDishNode = SplitStringtoDailyLunch(nodes[1].InnerHtml);
+            var thirdDishNode = SplitStringtoDailyLunch(nodes[2].InnerHtml);
+            var fourthDishNode = SplitStringtoDailyLunch(nodes[3].InnerHtml);
+
+            items.Add(firstDishNode);
+            items.Add(secondDishNode);
+            items.Add(thirdDishNode);
+            items.Add(fourthDishNode);
+
+            return items;
+        }
+
+        /// <summary>
+        /// Split string to DailyLunch Object
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        private DailyLunch SplitStringtoDailyLunch(string item)
+        {
+
+            var lunchItem = new LunchItem();
+            var split = item.Split("<br>");
+            var type = split[0].Split(">")[1].Split("<")[0];
+            var price = split[0].Split(">")[2].Split("<")[0];
+            var name = split[1].Substring(1);
+            lunchItem.Type = type;
+            lunchItem.Name = name;
+            var dailyLunch = new DailyLunch()
+            {
+                Items = new List<LunchItem>()
+                    {
+                        new LunchItem() { Name = name, Type = type }
+                    },
+                Price = price
+            };
+            return dailyLunch;
         }
 
         /// <summary>
@@ -37,11 +90,11 @@ namespace LunchScraper.Controllers
 
                 // Get the 1st dish
                 var firstDishNode = nodes[i + 1];
-                var firstDish = HtmlEntity.DeEntitize(firstDishNode.InnerText);
+                var firstDish = HtmlEntity.DeEntitize(firstDishNode.InnerText).TrimStart();
 
                 // Get the 2nd dish
                 var secondDishNode = nodes[i + 2];
-                var secondDish = HtmlEntity.DeEntitize(secondDishNode.InnerText);
+                var secondDish = HtmlEntity.DeEntitize(secondDishNode.InnerText).TrimStart();
 
                 items.Add(new DailyLunch()
                 {
@@ -104,7 +157,7 @@ namespace LunchScraper.Controllers
                 {
                     DayOfTheWeek = HtmlEntity.DeEntitize(node.SelectSingleNode("strong").InnerText),
                     Items = lunchItems,
-                    Price = HtmlEntity.DeEntitize(node.SelectSingleNode("span").InnerText),
+                    Price = HtmlEntity.DeEntitize(node.SelectSingleNode("span").InnerText).TrimStart(),
                 });
             }
             return items;
