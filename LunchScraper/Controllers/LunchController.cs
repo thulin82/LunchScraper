@@ -16,6 +16,8 @@ namespace LunchScraper.Controllers
             ViewBag.EdgeKitchenMenu = edgeKitchenMenu;
             ViewBag.MalmoOperaMenu = malmoOperaMenu;
 
+            ViewBag.Highlight = "raggmunk";
+
             return View();
         }
 

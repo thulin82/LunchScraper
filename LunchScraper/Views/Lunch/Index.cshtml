@@ -13,7 +13,7 @@
     <ul>
     @foreach (var food in item.Items)
     {
-        <li>@food.Name</li>
+        <li style="@((food.Name.IndexOf(ViewBag.Highlight) >= 0) ? "background: yellow" : "")">@food.Name</li>
     }
     </ul>
 }
@@ -27,7 +27,7 @@
     <ul>
     @foreach (var food in item.Items)
     {
-        <li>@food.Name</li>
+        <li style="@((food.Name.IndexOf(ViewBag.Highlight) >= 0) ? "background: yellow" : "")">@food.Name</li>
     }
     </ul>
 }
@@ -38,8 +38,8 @@
     <ul>
     @foreach (var food in item.Items)
     {
-        <li>@food.Type@food.Name</li>
-            @item.Price
+        <li style="@((food.Name.IndexOf(ViewBag.Highlight) >= 0) ? "background: yellow" : "")">@food.Name</li>
+        @item.Price
     }
     </ul>
 }
