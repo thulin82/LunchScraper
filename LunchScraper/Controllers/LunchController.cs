@@ -53,22 +53,23 @@ namespace LunchScraper.Controllers
         /// <returns></returns>
         private DailyLunch SplitStringtoDailyLunch(string item)
         {
-
-            var lunchItem = new LunchItem();
             var split = item.Split("<br>");
             var type = split[0].Split(">")[1].Split("<")[0];
             var price = split[0].Split(">")[2].Split("<")[0];
             var name = split[1].Substring(1);
-            lunchItem.Type = type;
-            lunchItem.Name = name;
-            var dailyLunch = new DailyLunch()
+
+            var lunchItem = new LunchItem
             {
-                Items = new List<LunchItem>()
-                    {
-                        new LunchItem() { Name = name, Type = type }
-                    },
+                Type = type,
+                Name = name
+            };
+
+            var dailyLunch = new DailyLunch
+            {
+                Items = new List<LunchItem> { lunchItem },
                 Price = price
             };
+
             return dailyLunch;
         }
 
@@ -80,7 +81,7 @@ namespace LunchScraper.Controllers
         {
             var web = new HtmlWeb();
             var doc = web.LoadFromWebAsync("https://edgekitchen.se/meny", System.Text.Encoding.UTF8).Result;
-            var nodes = doc.DocumentNode.SelectNodes("//body/div[4]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/p[position()>4 and position()<24]");
+            var nodes = doc.DocumentNode.SelectNodes("//body/div[4]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/p[position()>3 and position()<23]");
 
             List<DailyLunch> items = new List<DailyLunch>();
 
