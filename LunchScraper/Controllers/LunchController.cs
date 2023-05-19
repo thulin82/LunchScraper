@@ -25,7 +25,7 @@ namespace LunchScraper.Controllers
         /// Get lunch menu from Malmö Opera
         /// </summary>
         /// <returns></returns>
-        private List<DailyLunch> GetMalmoOperaLunch()
+        private static List<DailyLunch> GetMalmoOperaLunch()
         {
             var web = new HtmlWeb();
             var doc = web.LoadFromWebAsync("https://www.malmoopera.se/mat-och-dryck/lunchmeny", System.Text.Encoding.UTF8).Result;
@@ -51,12 +51,12 @@ namespace LunchScraper.Controllers
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        private DailyLunch SplitStringtoDailyLunch(string item)
+        private static DailyLunch SplitStringtoDailyLunch(string item)
         {
             var split = item.Split("<br>");
             var type = split[0].Split(">")[1].Split("<")[0];
             var price = split[0].Split(">")[2].Split("<")[0];
-            var name = split[1].Substring(1);
+            var name = split[1][1..];
 
             var lunchItem = new LunchItem
             {
@@ -77,7 +77,7 @@ namespace LunchScraper.Controllers
         /// Get lunch menu from Edge Kitchen
         /// </summary>
         /// <returns></returns>
-        private List<DailyLunch> GetEdgeKitchenLunch()
+        private static List<DailyLunch> GetEdgeKitchenLunch()
         {
             var web = new HtmlWeb();
             var doc = web.LoadFromWebAsync("https://edgekitchen.se/meny", System.Text.Encoding.UTF8).Result;
@@ -119,7 +119,7 @@ namespace LunchScraper.Controllers
         /// Get lunch menu from Malmö Arena
         /// </summary>
         /// <returns></returns>
-        private List<DailyLunch> GetMalmoArenaLunch()
+        private static List<DailyLunch> GetMalmoArenaLunch()
         {
             var web = new HtmlWeb();
             var doc = web.LoadFromWebAsync("https://www.malmoarena.com/mat-dryck/lunch", System.Text.Encoding.UTF8).Result;
@@ -141,8 +141,8 @@ namespace LunchScraper.Controllers
                     {
                         Name = HtmlEntity.DeEntitize(firstDishNode.NextSibling.InnerText)
                     });
-                } 
-                
+                }
+
                 if (secondDishNode != null && secondDishNode.NextSibling != null)
                 {
                     lunchItems.Add(new LunchItem()
@@ -169,10 +169,6 @@ namespace LunchScraper.Controllers
                         Items = lunchItems,
                         Price = HtmlEntity.DeEntitize(spanNode.InnerText).TrimStart(),
                     });
-                }
-                else
-                {
-                    throw new NotImplementedException();
                 }
             }
             return items;
