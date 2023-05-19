@@ -131,33 +131,9 @@ namespace LunchScraper.Controllers
             {
                 List<LunchItem> lunchItems = new();
 
-                var firstDishNode = node.SelectSingleNode("br[1]");
-                var secondDishNode = node.SelectSingleNode("br[2]");
-                var thirdDishNode = node.SelectSingleNode("br[3]");
-
-                if (firstDishNode != null && firstDishNode.NextSibling != null)
-                {
-                    lunchItems.Add(new LunchItem()
-                    {
-                        Name = HtmlEntity.DeEntitize(firstDishNode.NextSibling.InnerText)
-                    });
-                }
-
-                if (secondDishNode != null && secondDishNode.NextSibling != null)
-                {
-                    lunchItems.Add(new LunchItem()
-                    {
-                        Name = HtmlEntity.DeEntitize(secondDishNode.NextSibling.InnerText)
-                    });
-                }
-
-                if (thirdDishNode != null && thirdDishNode.NextSibling != null)
-                {
-                    lunchItems.Add(new LunchItem()
-                    {
-                        Name = HtmlEntity.DeEntitize(thirdDishNode.NextSibling.InnerText)
-                    });
-                }
+                AddLunchItem(lunchItems, node, 1);
+                AddLunchItem(lunchItems, node, 2);
+                AddLunchItem(lunchItems, node, 3);
 
                 var strongNode = node.SelectSingleNode("strong");
                 var spanNode = node.SelectSingleNode("span");
@@ -172,6 +148,24 @@ namespace LunchScraper.Controllers
                 }
             }
             return items;
+        }
+
+        /// <summary>
+        /// Add lunch item to list
+        /// </summary>
+        /// <param name="lunchItems"></param>
+        /// <param name="node"></param>
+        /// <param name="brIndex"></param>
+        private static void AddLunchItem(List<LunchItem> lunchItems, HtmlNode node, int brIndex)
+        {
+            var dishNode = node.SelectSingleNode($"br[{brIndex}]");
+            if (dishNode != null && dishNode.NextSibling != null)
+            {
+                lunchItems.Add(new LunchItem()
+                {
+                    Name = HtmlEntity.DeEntitize(dishNode.NextSibling.InnerText)
+                });
+            }
         }
     }
 }
