@@ -31,7 +31,7 @@ namespace LunchScraper.Controllers
             var doc = web.LoadFromWebAsync("https://www.malmoopera.se/mat-och-dryck/lunchmeny", System.Text.Encoding.UTF8).Result;
             var nodes = doc.DocumentNode.SelectNodes("//body/div[@id='page-wrapper']/div[1]/div[2]/div[1]/section[1]/div[1]/p[position()>2 and position()<7]");
 
-            List<DailyLunch> items = new List<DailyLunch>();
+            List<DailyLunch> items = new();
 
             var firstDishNode = SplitStringtoDailyLunch(nodes[0].InnerHtml);
             var secondDishNode = SplitStringtoDailyLunch(nodes[1].InnerHtml);
@@ -81,9 +81,9 @@ namespace LunchScraper.Controllers
         {
             var web = new HtmlWeb();
             var doc = web.LoadFromWebAsync("https://edgekitchen.se/meny", System.Text.Encoding.UTF8).Result;
-            var nodes = doc.DocumentNode.SelectNodes("//body/div[4]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/p[position()>3 and position()<23]");
+            var nodes = doc.DocumentNode.SelectNodes("//body/div[4]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/p[position()>4 and position()<24]");
 
-            List<DailyLunch> items = new List<DailyLunch>();
+            List<DailyLunch> items = new();
 
             for (int i = 0; i < nodes.Count; i += 4)
             {
@@ -125,21 +125,24 @@ namespace LunchScraper.Controllers
             var doc = web.LoadFromWebAsync("https://www.malmoarena.com/mat-dryck/lunch", System.Text.Encoding.UTF8).Result;
             var nodes = doc.DocumentNode.SelectNodes("//body/div[4]/div[1]/div[1]/div[1]/div[3]/div[1]/div[1]/div[3]/p[position()>1]");
 
-            List<DailyLunch> items = new List<DailyLunch>();
+            List<DailyLunch> items = new();
 
             foreach (var node in nodes)
             {
-                var lunchItems = new List<LunchItem>();
+                List<LunchItem> lunchItems = new();
 
-                var firstDishNode = node.SelectSingleNode("br[1]").NextSibling;
+                var firstDishNode = node.SelectSingleNode("br[1]");
                 var secondDishNode = node.SelectSingleNode("br[2]");
                 var thirdDishNode = node.SelectSingleNode("br[3]");
 
-                lunchItems.Add(new LunchItem()
+                if (firstDishNode != null && firstDishNode.NextSibling != null)
                 {
-                    Name = HtmlEntity.DeEntitize(firstDishNode.InnerText)
-                });
-
+                    lunchItems.Add(new LunchItem()
+                    {
+                        Name = HtmlEntity.DeEntitize(firstDishNode.NextSibling.InnerText)
+                    });
+                } 
+                
                 if (secondDishNode != null && secondDishNode.NextSibling != null)
                 {
                     lunchItems.Add(new LunchItem()
@@ -156,12 +159,21 @@ namespace LunchScraper.Controllers
                     });
                 }
 
-                items.Add(new DailyLunch()
+                var strongNode = node.SelectSingleNode("strong");
+                var spanNode = node.SelectSingleNode("span");
+                if (strongNode != null && spanNode != null)
                 {
-                    DayOfTheWeek = HtmlEntity.DeEntitize(node.SelectSingleNode("strong").InnerText),
-                    Items = lunchItems,
-                    Price = HtmlEntity.DeEntitize(node.SelectSingleNode("span").InnerText).TrimStart(),
-                });
+                    items.Add(new DailyLunch()
+                    {
+                        DayOfTheWeek = HtmlEntity.DeEntitize(strongNode.InnerText),
+                        Items = lunchItems,
+                        Price = HtmlEntity.DeEntitize(spanNode.InnerText).TrimStart(),
+                    });
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
             return items;
         }
