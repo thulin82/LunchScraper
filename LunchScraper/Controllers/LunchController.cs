@@ -81,7 +81,7 @@ namespace LunchScraper.Controllers
         {
             var web = new HtmlWeb();
             var doc = web.LoadFromWebAsync("https://edgekitchen.se/meny", System.Text.Encoding.UTF8).Result;
-            var nodes = doc.DocumentNode.SelectNodes("//body/div[4]/div[4]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/p[position()>4 and position()<24]");
+            var nodes = doc.DocumentNode.SelectNodes("//p[@class=\"mobile-undersized-upper\"][position()>2 and position()<22]");
 
             List<DailyLunch> items = new();
 
@@ -123,7 +123,7 @@ namespace LunchScraper.Controllers
         {
             var web = new HtmlWeb();
             var doc = web.LoadFromWebAsync("https://www.malmoarena.com/mat-dryck/lunch", System.Text.Encoding.UTF8).Result;
-            var nodes = doc.DocumentNode.SelectNodes("//body/div[4]/div[1]/div[1]/div[1]/div[3]/div[1]/div[1]/div[3]/p[position()>1]");
+            var nodes = doc.DocumentNode.SelectNodes("//h3[contains(text(),\"Dagens lunch\")]/../p[position()>1]");
 
             List<DailyLunch> items = new();
 
