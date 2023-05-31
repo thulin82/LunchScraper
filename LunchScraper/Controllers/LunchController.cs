@@ -54,23 +54,30 @@ namespace LunchScraper.Controllers
         private static DailyLunch SplitStringtoDailyLunch(string item)
         {
             var split = item.Split("<br>");
-            var type = split[0].Split(">")[1].Split("<")[0];
-            var price = split[0].Split(">")[2].Split("<")[0];
-            var name = split[1][1..];
-
-            var lunchItem = new LunchItem
+            if (split.Length >= 2)
             {
-                Type = type,
-                Name = name
-            };
+                var type = split[0].Split(">")[1].Split("<")[0];
+                var price = split[0].Split(">")[2].Split("<")[0];
+                var name = split[1][1..];
 
-            var dailyLunch = new DailyLunch
+                var lunchItem = new LunchItem
+                {
+                    Type = type,
+                    Name = name
+                };
+
+                var dailyLunch = new DailyLunch
+                {
+                    Items = new List<LunchItem> { lunchItem },
+                    Price = price
+                };
+
+                return dailyLunch;
+            }
+            else
             {
-                Items = new List<LunchItem> { lunchItem },
-                Price = price
-            };
-
-            return dailyLunch;
+                return new DailyLunch();
+            }
         }
 
         /// <summary>
